@@ -2,8 +2,9 @@ package com.qqq.main;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,8 +26,9 @@ public class Main {
 		String startDate = null;
 		String path = System.getProperty("user.dir");
 		@SuppressWarnings("resource")
-		BufferedReader r = new BufferedReader(new FileReader(new File(path
-				+ "/config/config.txt")));
+		BufferedReader r = new BufferedReader(new InputStreamReader(
+				new FileInputStream(new File(path + "/config/config.txt")),
+				"UTF-8"));
 		String str;
 		List<String> list = new ArrayList<String>();
 		while ((str = r.readLine()) != null) {
@@ -35,8 +37,8 @@ public class Main {
 		}
 
 		for (String s : list) {
-			if (s.startsWith("源路径：")) {
-				Dao.setInPath(s.substring(new String("源路径：").length()));
+			if (s.startsWith("﻿源路径：")) {
+				Dao.setInPath(s.substring(new String("﻿源路径：").length()));
 			}
 			if (s.startsWith("目标路径：")) {
 				Dao.setOutPath(s.substring(new String("目标路径：").length()));
@@ -80,14 +82,14 @@ public class Main {
 		}
 
 		System.out.println(Dao.getInPath());
-		
+
 		Dao.createPerson();
-		Dao.setPBs(startDate);
-		Dao.setKQs(startDate);
-		Dao.setOuts();
-		Dao.setHolidays(startDate);
-		Dao.sumPBs();
-		Dao.setAdds();
+//		Dao.setPBs(startDate);
+//		Dao.setKQs(startDate);
+//		Dao.setOuts();
+//		Dao.setHolidays(startDate);
+//		Dao.sumPBs();
+//		Dao.setAdds();
 
 		Date end = new Date();
 		System.out.println("use" + (end.getTime() - start.getTime()) / 1000

@@ -1,5 +1,6 @@
 package com.qqq.util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,6 +64,8 @@ public class Tools {
 	public static void writerString(String inPath, String inFileName,
 			String outPath, String outFileName, String fileType, int rowNum,
 			int cellNum, String string, boolean flag) throws IOException {
+		File file = new File(outPath);
+		file.mkdir();
 		InputStream instream = new FileInputStream(inPath + inFileName + "."
 				+ fileType);
 		Workbook wb = null;
