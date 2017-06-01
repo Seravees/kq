@@ -15,8 +15,10 @@ import com.qqq.model.Add;
 import com.qqq.model.Holiday;
 import com.qqq.model.HolidayPerson;
 import com.qqq.model.KQ;
+import com.qqq.model.KQPerson;
 import com.qqq.model.Out;
 import com.qqq.model.PB;
+import com.qqq.model.PBPerson;
 import com.qqq.model.Person;
 import com.qqq.util.Tools;
 
@@ -176,6 +178,112 @@ public class Dao {
 		}
 	}
 
+	public static void setPBs() throws IOException {
+		List<List<Object>> pb1s = Tools.readAll(inPath, pb1, XLS);
+		List<List<Object>> pb2s = Tools.readAll(inPath, pb2, XLS);
+
+		List<PB> pbs = new ArrayList<PB>();
+
+		for (int i = 1; i < pb1s.size(); i++) {
+			for (int j = 3; j < pb1s.get(i).size(); j++) {
+				PB pb = new PB();
+				pb.setDate(pb1s.get(0).get(j).toString().substring(0, 5));
+				pb.setWeekday(pb1s.get(0).get(j).toString().substring(6, 9));
+				pb.setDepartment(pb1s.get(i).get(0).toString());
+				pb.setName(pb1s.get(i).get(2).toString());
+				pb.setPb(pb1s.get(i).get(j).toString());
+
+				pbs.add(pb);
+			}
+		}
+
+		for (int i = 1; i < pb2s.size(); i++) {
+			for (int j = 3; j < pb2s.get(i).size(); j++) {
+				PB pb = new PB();
+				pb.setDate(pb2s.get(0).get(j).toString().substring(0, 5));
+				pb.setWeekday(pb2s.get(0).get(j).toString().substring(6, 9));
+				pb.setDepartment(pb2s.get(i).get(0).toString());
+				pb.setName(pb2s.get(i).get(2).toString());
+				pb.setPb(pb2s.get(i).get(j).toString());
+
+				pbs.add(pb);
+			}
+		}
+
+		List<PBPerson> pbPersons = new ArrayList<PBPerson>();
+
+		for (PB pb : pbs) {
+			if (pbPersons.size() > 0) {
+				int j = 0;
+				for (int i = 0; i < pbPersons.size(); i++) {
+					if (pbPersons.get(i).getName().equals(pb.getName())
+							&& pbPersons.get(i).getDepartment()
+									.equals(pb.getDepartment())) {
+						List<PB> tempPBs = pbPersons.get(i).getPbs();
+						tempPBs.add(pb);
+						pbPersons.get(i).setPbs(tempPBs);
+						if (pb.getPb().contains("中班")) {
+							pbPersons.get(i).setZhongban(
+									pbPersons.get(i).getZhongban() + 1);
+						} else if (pb.getPb().contains("晚班")) {
+							pbPersons.get(i).setYeban(
+									pbPersons.get(i).getYeban() + 1);
+						}
+						j = i;
+						break;
+					}
+				}
+				if (!pbPersons.get(j).getName().equals(pb.getName())
+						|| !pbPersons.get(j).getDepartment()
+								.equals(pb.getDepartment())) {
+					PBPerson tempPBPerson = new PBPerson();
+					tempPBPerson.setDepartment(pb.getDepartment());
+					tempPBPerson.setName(pb.getName());
+					List<PB> tempPBs = new ArrayList<PB>();
+					tempPBs.add(pb);
+					tempPBPerson.setPbs(tempPBs);
+					if (pb.getPb().contains("中班")) {
+						tempPBPerson.setZhongban(1);
+					} else if (pb.getPb().contains("晚班")) {
+						tempPBPerson.setYeban(1);
+					}
+					pbPersons.add(tempPBPerson);
+				}
+			} else {
+				PBPerson pbPerson = new PBPerson();
+				pbPerson.setDepartment(pb.getDepartment());
+				pbPerson.setName(pb.getName());
+				List<PB> tempPBs = new ArrayList<PB>();
+				tempPBs.add(pb);
+				pbPerson.setPbs(tempPBs);
+				if (pb.getPb().contains("中班")) {
+					pbPerson.setZhongban(1);
+				} else if (pb.getPb().contains("晚班")) {
+					pbPerson.setYeban(1);
+				}
+				pbPersons.add(pbPerson);
+			}
+		}
+
+		for (PBPerson pbPerson : pbPersons) {
+			String fileName = pbPerson.getDepartment() + "-"
+					+ pbPerson.getName();
+			for (int i = 0; i < pbPerson.getPbs().size(); i++) {
+				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
+						i + 5, 0, pbPerson.getPbs().get(i).getDate(), true);
+				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
+						i + 5, 1, pbPerson.getPbs().get(i).getWeekday(), true);
+				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
+						i + 5, 2, pbPerson.getPbs().get(i).getPb(), true);
+			}
+			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 38,
+					1, "" + pbPerson.getZhongban(), false);
+			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 38,
+					4, "" + pbPerson.getYeban(), false);
+		}
+
+	}
+
 	public static void setPBs(String date) throws IOException, ParseException {
 		List<List<Object>> pb1s = Tools.readAll(inPath, pb1, XLS);
 		List<List<Object>> pb2s = Tools.readAll(inPath, pb2, XLS);
@@ -221,6 +329,96 @@ public class Dao {
 			Tools.writerString(outPath, fileName, outPath, fileName, XLS,
 					rowNum, 2, pb.getPb(), true);
 
+		}
+	}
+
+	public static void setKQs() throws IOException {
+		List<List<Object>> kq1s = Tools.readAll(inPath, kq1, XLS);
+		List<List<Object>> kq2s = Tools.readAll(inPath, kq2, XLS);
+
+		List<KQ> kqs = new ArrayList<KQ>();
+
+		for (int i = 2; i < kq1s.size(); i++) {
+			for (int j = 1; j < kq1s.get(i).size() / 2; j++) {
+				KQ kq = new KQ();
+				kq.setDate(kq1s.get(0).get(j * 2).toString().substring(0, 5));
+				kq.setWeekday(kq1s.get(0).get(j * 2).toString().substring(6, 9));
+				kq.setDepartment(kq1s.get(i).get(0).toString());
+				kq.setName(kq1s.get(i).get(1).toString());
+				kq.setStart(kq1s.get(i).get(j * 2).toString());
+				kq.setEnd(kq1s.get(i).get(j * 2 + 1).toString());
+				kqs.add(kq);
+			}
+		}
+
+		for (int i = 2; i < kq2s.size(); i++) {
+			for (int j = 1; j < kq2s.get(i).size() / 2; j++) {
+				KQ kq = new KQ();
+				kq.setDate(kq2s.get(0).get(j * 2).toString().substring(0, 5));
+				kq.setWeekday(kq2s.get(0).get(j * 2).toString().substring(6, 9));
+				kq.setDepartment(kq2s.get(i).get(0).toString());
+				kq.setName(kq2s.get(i).get(1).toString());
+				kq.setStart(kq2s.get(i).get(j * 2).toString());
+				kq.setEnd(kq2s.get(i).get(j * 2 + 1).toString());
+				kqs.add(kq);
+			}
+		}
+
+		List<KQPerson> kqPersons = new ArrayList<KQPerson>();
+
+		for (KQ kq : kqs) {
+			if (kqPersons.size() > 0) {
+				int j = 0;
+				for (int i = 0; i < kqPersons.size(); i++) {
+					if (kqPersons.get(i).getDepartment()
+							.equals(kq.getDepartment())
+							&& kqPersons.get(i).getName().equals(kq.getName())) {
+						List<KQ> tempKQs = kqPersons.get(i).getKqs();
+						tempKQs.add(kq);
+						kqPersons.get(i).setKqs(tempKQs);
+						j = i;
+						break;
+					}
+				}
+				if (!kqPersons.get(j).getDepartment()
+						.equals(kq.getDepartment())
+						|| !kqPersons.get(j).getName().equals(kq.getName())) {
+					KQPerson tempKQPerson = new KQPerson();
+					tempKQPerson.setDepartment(kq.getDepartment());
+					tempKQPerson.setName(kq.getName());
+					List<KQ> tempKQs = new ArrayList<KQ>();
+					tempKQs.add(kq);
+					tempKQPerson.setKqs(tempKQs);
+					kqPersons.add(tempKQPerson);
+				}
+			} else {
+				KQPerson kqPerson = new KQPerson();
+				kqPerson.setDepartment(kq.getDepartment());
+				kqPerson.setName(kq.getName());
+				List<KQ> tempKQs = new ArrayList<KQ>();
+				tempKQs.add(kq);
+				kqPerson.setKqs(tempKQs);
+				kqPersons.add(kqPerson);
+			}
+		}
+
+		for (KQPerson kqPerson : kqPersons) {
+			String fileName = kqPerson.getDepartment() + "-"
+					+ kqPerson.getName();
+			for (KQ kq : kqPerson.getKqs()) {
+				Workbook wb = Tools.open(outPath, fileName, XLS);
+				Sheet sheet = wb.getSheetAt(0);
+				String date = kq.getDate();
+				for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+					if (sheet.getRow(i).getCell(0).getStringCellValue()
+							.equals(date)) {
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i, 3, kq.getStart(), true);
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i, 4, kq.getEnd(), true);
+					}
+				}
+			}
 		}
 	}
 
@@ -273,6 +471,165 @@ public class Dao {
 
 		}
 
+	}
+
+	public static void setHolidays() throws IOException {
+		List<List<Object>> holidays = Tools.readAll(inPath, holiday, XLS);
+		List<Holiday> hols = new ArrayList<Holiday>();
+
+		for (int i = 3; i < holidays.size(); i++) {
+			Holiday hol = new Holiday();
+			hol.setDate(((String) holidays.get(i).get(3)).substring(5, 10));
+			hol.setDepartment((String) holidays.get(i).get(2));
+			hol.setName((String) holidays.get(i).get(1));
+			hol.setStart(((String) holidays.get(i).get(3)).substring(5));
+			hol.setEnd(((String) holidays.get(i).get(4)).substring(5));
+			hol.setType((String) holidays.get(i).get(8));
+			double hours = ((Double) holidays.get(i).get(10) * 8 + (Double) holidays
+					.get(i).get(11));
+			hol.setHours(hours);
+			hols.add(hol);
+		}
+
+		List<HolidayPerson> holidayPersons = new ArrayList<HolidayPerson>();
+		for (Holiday holiday : hols) {
+
+			if (holidayPersons.size() > 0) {
+				int j = 0;
+				for (int i = 0; i < holidayPersons.size(); i++) {
+					if (holidayPersons.get(i).getName()
+							.equals(holiday.getName())
+							&& holidayPersons.get(i).getDepartment()
+									.equals(holiday.getDepartment())) {
+						List<Holiday> tempholidays = holidayPersons.get(i)
+								.getHolidays();
+						tempholidays.add(holiday);
+						holidayPersons.get(i).setHolidays(tempholidays);
+						if (holiday.getType().equals("年假")) {
+							holidayPersons.get(i).setNianjia(
+									holidayPersons.get(i).getNianjia()
+											+ holiday.getHours());
+						} else if (holiday.getType().equals("事假")) {
+							holidayPersons.get(i).setShijia(
+									holidayPersons.get(i).getShijia()
+											+ holiday.getHours());
+						} else if (holiday.getType().equals("病假")) {
+							holidayPersons.get(i).setBingjia(
+									holidayPersons.get(i).getBingjia()
+											+ holiday.getHours());
+						} else if (holiday.getType().equals("调休")) {
+							holidayPersons.get(i).setTiaoxiu(
+									holidayPersons.get(i).getTiaoxiu()
+											+ holiday.getHours());
+						} else {
+							holidayPersons.get(i).setQita(
+									holidayPersons.get(i).getQita()
+											+ holiday.getHours());
+						}
+						j = i;
+						break;
+					}
+				}
+				if (!holidayPersons.get(j).getName().equals(holiday.getName())
+						|| !holidayPersons.get(j).getDepartment()
+								.equals(holiday.getDepartment())) {
+					HolidayPerson tempholidayPerson = new HolidayPerson();
+					tempholidayPerson.setName(holiday.getName());
+					tempholidayPerson.setDepartment(holiday.getDepartment());
+					List<Holiday> tempholidays = new ArrayList<Holiday>();
+					tempholidays.add(holiday);
+					tempholidayPerson.setHolidays(tempholidays);
+					if (holiday.getType().equals("年假")) {
+						tempholidayPerson.setNianjia(holiday.getHours());
+					} else if (holiday.getType().equals("事假")) {
+						tempholidayPerson.setShijia(holiday.getHours());
+					} else if (holiday.getType().equals("病假")) {
+						tempholidayPerson.setBingjia(holiday.getHours());
+					} else if (holiday.getType().equals("调休")) {
+						tempholidayPerson.setTiaoxiu(holiday.getHours());
+					} else {
+						tempholidayPerson.setQita(holiday.getHours());
+					}
+					holidayPersons.add(tempholidayPerson);
+				}
+			} else {
+				HolidayPerson holidayPerson = new HolidayPerson();
+				holidayPerson.setName(holiday.getName());
+				holidayPerson.setDepartment(holiday.getDepartment());
+				List<Holiday> tempholidays = new ArrayList<Holiday>();
+				tempholidays.add(holiday);
+				holidayPerson.setHolidays(tempholidays);
+				if (holiday.getType().equals("年假")) {
+					holidayPerson.setNianjia(holiday.getHours());
+				} else if (holiday.getType().equals("事假")) {
+					holidayPerson.setShijia(holiday.getHours());
+				} else if (holiday.getType().equals("病假")) {
+					holidayPerson.setBingjia(holiday.getHours());
+				} else if (holiday.getType().equals("调休")) {
+					holidayPerson.setTiaoxiu(holiday.getHours());
+				} else {
+					holidayPerson.setQita(holiday.getHours());
+				}
+				holidayPersons.add(holidayPerson);
+			}
+
+		}
+
+		for (HolidayPerson holidayPerson : holidayPersons) {
+			String fileName = holidayPerson.getDepartment() + "-"
+					+ holidayPerson.getName();
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+					1, holidayPerson.getNianjia(), false);
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+					4, holidayPerson.getBingjia(), false);
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+					7, holidayPerson.getShijia(), false);
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+					10, holidayPerson.getTiaoxiu(), false);
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+					13, holidayPerson.getQita(), false);
+
+			for (Holiday holiday : holidayPerson.getHolidays()) {
+				Workbook wb = Tools.open(outPath, fileName, XLS);
+				Sheet sheet = wb.getSheetAt(0);
+				String date = holiday.getDate();
+				for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+					if (sheet.getRow(i).getCell(0).getStringCellValue()
+							.equals(date)) {
+						if (sheet.getRow(i).getCell(10).getStringCellValue() == ""
+								|| sheet.getRow(i).getCell(10) == null) {
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i, 10, holiday.getStart(),
+									true);
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i, 11, holiday.getEnd(),
+									true);
+							Tools.writerDouble(outPath, fileName, outPath,
+									fileName, XLS, i, 12, holiday.getHours(),
+									true);
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i, 13, holiday.getType(),
+									true);
+						} else {
+							Tools.shift(outPath, fileName, outPath, fileName,
+									XLS, i + 1);
+							// Tools.writerString(outPath, fileName, outPath,
+							// fileName, XLS, i + 1, 10,
+							// holiday.getStart(), true);
+							// Tools.writerString(outPath, fileName, outPath,
+							// fileName, XLS, i + 1, 11, holiday.getEnd(),
+							// true);
+							// Tools.writerDouble(outPath, fileName, outPath,
+							// fileName, XLS, i + 1, 12,
+							// holiday.getHours(), true);
+							// Tools.writerString(outPath, fileName, outPath,
+							// fileName, XLS, i + 1, 13,
+							// holiday.getType(), true);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static void setHolidays(String date) throws IOException,
@@ -599,6 +956,20 @@ public class Dao {
 								fileName, XLS, i, 8, add.getHours(), true);
 						Tools.writerString(outPath, fileName, outPath,
 								fileName, XLS, i, 9, add.getApply(), true);
+					} else if (sheet.getRow(i + 1).getCell(0)
+							.getStringCellValue().equals(date)
+							&& sheet.getRow(i + 1).getCell(6)
+									.getStringCellValue() == "") {
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i + 1, 5, add.getSite(), true);
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i + 1, 6, add.getStart(), true);
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i + 1, 7, add.getEnd(), true);
+						Tools.writerDouble(outPath, fileName, outPath,
+								fileName, XLS, i + 1, 8, add.getHours(), true);
+						Tools.writerString(outPath, fileName, outPath,
+								fileName, XLS, i + 1, 9, add.getApply(), true);
 					} else {
 						Tools.shift(outPath, fileName, outPath, fileName, XLS,
 								i + 1);

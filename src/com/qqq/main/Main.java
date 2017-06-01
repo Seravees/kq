@@ -84,12 +84,15 @@ public class Main {
 		System.out.println(Dao.getInPath());
 
 		Dao.createPerson();
-//		Dao.setPBs(startDate);
-//		Dao.setKQs(startDate);
-//		Dao.setOuts();
-//		Dao.setHolidays(startDate);
-//		Dao.sumPBs();
-//		Dao.setAdds();
+		Dao.setPBs();
+		// Dao.setPBs(startDate);
+		Dao.setKQs();
+		// Dao.setKQs(startDate);
+		Dao.setOuts();
+		Dao.setHolidays();
+		// Dao.setHolidays(startDate);
+		// Dao.sumPBs();
+		// Dao.setAdds();
 
 		Date end = new Date();
 		System.out.println("use" + (end.getTime() - start.getTime()) / 1000

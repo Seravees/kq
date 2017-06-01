@@ -56,4 +56,11 @@ public class KQ {
 		this.end = end;
 	}
 
+	@Override
+	public String toString() {
+		return "KQ [name=" + name + ", department=" + department + ", date="
+				+ date + ", weekday=" + weekday + ", start=" + start + ", end="
+				+ end + "]";
+	}
+
 }
