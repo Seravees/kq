@@ -85,6 +85,7 @@ public class Tools {
 
 		CellStyle style = wb.createCellStyle();
 		style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 		style.setFillForegroundColor(HSSFColor.YELLOW.index);
 		style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
@@ -95,11 +96,16 @@ public class Tools {
 		CellStyle style2 = wb.createCellStyle();
 		style2.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 		style2.setFillForegroundColor(HSSFColor.WHITE.index);
+		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		style2.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 		style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 		style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);
 		style2.setBorderRight(HSSFCellStyle.BORDER_THIN);
 		style2.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+		CellStyle style3 = wb.createCellStyle();
+		style3.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		style3.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
 		if (flag) {
 			if (string.contains("缺勤") || string.contains("否")) {
@@ -107,6 +113,8 @@ public class Tools {
 			} else {
 				cell.setCellStyle(style2);
 			}
+		} else {
+			cell.setCellStyle(style3);
 		}
 
 		cell.setCellValue(string);
@@ -142,13 +150,22 @@ public class Tools {
 		}
 		CellStyle style = wb.createCellStyle();
 
+		style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 		style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
 		style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
 		style.setBorderRight(HSSFCellStyle.BORDER_THIN);
 		style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+		CellStyle style2 = wb.createCellStyle();
+
+		style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		style2.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+
 		if (flag) {
 			cell.setCellStyle(style);
+		} else {
+			cell.setCellStyle(style2);
 		}
 		cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 		cell.setCellValue(string);
@@ -195,7 +212,7 @@ public class Tools {
 		sheet.shiftRows(startRow, sheet.getLastRowNum(), 1, true, false);
 		Row row = sheet.createRow(startRow);
 		row.setHeight(sheet.getRow(startRow - 1).getHeight());
-		for (int i = 0; i <= 8; i++) {
+		for (int i = 0; i <= 14; i++) {
 			Cell cell = row.createCell(i);
 			cell.setCellStyle(sheet.getRow(startRow - 1).getCell(i)
 					.getCellStyle());

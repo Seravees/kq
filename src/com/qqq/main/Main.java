@@ -23,7 +23,6 @@ public class Main {
 		// TODO Auto-generated method stub
 		Date start = new Date();
 
-		String startDate = null;
 		String path = System.getProperty("user.dir");
 		@SuppressWarnings("resource")
 		BufferedReader r = new BufferedReader(new InputStreamReader(
@@ -76,9 +75,9 @@ public class Main {
 			if (s.startsWith("外出：")) {
 				Dao.setOut(s.substring(new String("外出：").length()));
 			}
-			if (s.startsWith("开始日期：")) {
-				startDate = s.substring(new String("开始日期：").length());
-			}
+			// if (s.startsWith("开始日期：")) {
+			// startDate = s.substring(new String("开始日期：").length());
+			// }
 		}
 
 		System.out.println(Dao.getInPath());
@@ -92,7 +91,9 @@ public class Main {
 		Dao.setHolidays();
 		// Dao.setHolidays(startDate);
 		// Dao.sumPBs();
-		// Dao.setAdds();
+		Dao.setAdds();
+		Dao.merge();
+
 
 		Date end = new Date();
 		System.out.println("use" + (end.getTime() - start.getTime()) / 1000

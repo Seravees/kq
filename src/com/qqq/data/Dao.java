@@ -1,6 +1,10 @@
 package com.qqq.data;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,8 +12,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import com.qqq.model.Add;
 import com.qqq.model.Holiday;
@@ -52,6 +63,8 @@ public class Dao {
 	static String add2;
 	static String add2se;
 	static String out;
+
+	static List<Person> persons;
 
 	public static String getInPath() {
 		return inPath;
@@ -160,7 +173,7 @@ public class Dao {
 	// TODO Auto-generated method stub
 	public static void createPerson() throws IOException {
 		List<List<Object>> names = Tools.readAll(inPath, name, XLSX);
-		List<Person> persons = new ArrayList<Person>();
+		persons = new ArrayList<Person>();
 		for (int i = 1; i < names.size(); i++) {
 			Person person = new Person();
 			person.setName((String) names.get(i).get(1));
@@ -610,21 +623,25 @@ public class Dao {
 							Tools.writerString(outPath, fileName, outPath,
 									fileName, XLS, i, 13, holiday.getType(),
 									true);
-						} else {
+							break;
+						} else if (!sheet.getRow(i + 1).getCell(0)
+								.getStringCellValue().equals(date)) {
+							System.out.println("" + i);
 							Tools.shift(outPath, fileName, outPath, fileName,
 									XLS, i + 1);
-							// Tools.writerString(outPath, fileName, outPath,
-							// fileName, XLS, i + 1, 10,
-							// holiday.getStart(), true);
-							// Tools.writerString(outPath, fileName, outPath,
-							// fileName, XLS, i + 1, 11, holiday.getEnd(),
-							// true);
-							// Tools.writerDouble(outPath, fileName, outPath,
-							// fileName, XLS, i + 1, 12,
-							// holiday.getHours(), true);
-							// Tools.writerString(outPath, fileName, outPath,
-							// fileName, XLS, i + 1, 13,
-							// holiday.getType(), true);
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i + 1, 10,
+									holiday.getStart(), true);
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i + 1, 11, holiday.getEnd(),
+									true);
+							Tools.writerDouble(outPath, fileName, outPath,
+									fileName, XLS, i + 1, 12,
+									holiday.getHours(), true);
+							Tools.writerString(outPath, fileName, outPath,
+									fileName, XLS, i + 1, 13,
+									holiday.getType(), true);
+							break;
 						}
 					}
 				}
@@ -956,21 +973,9 @@ public class Dao {
 								fileName, XLS, i, 8, add.getHours(), true);
 						Tools.writerString(outPath, fileName, outPath,
 								fileName, XLS, i, 9, add.getApply(), true);
-					} else if (sheet.getRow(i + 1).getCell(0)
-							.getStringCellValue().equals(date)
-							&& sheet.getRow(i + 1).getCell(6)
-									.getStringCellValue() == "") {
-						Tools.writerString(outPath, fileName, outPath,
-								fileName, XLS, i + 1, 5, add.getSite(), true);
-						Tools.writerString(outPath, fileName, outPath,
-								fileName, XLS, i + 1, 6, add.getStart(), true);
-						Tools.writerString(outPath, fileName, outPath,
-								fileName, XLS, i + 1, 7, add.getEnd(), true);
-						Tools.writerDouble(outPath, fileName, outPath,
-								fileName, XLS, i + 1, 8, add.getHours(), true);
-						Tools.writerString(outPath, fileName, outPath,
-								fileName, XLS, i + 1, 9, add.getApply(), true);
-					} else {
+						break;
+					} else if (!sheet.getRow(i + 1).getCell(0)
+							.getStringCellValue().equals(date)) {
 						Tools.shift(outPath, fileName, outPath, fileName, XLS,
 								i + 1);
 						Tools.writerString(outPath, fileName, outPath,
@@ -983,9 +988,62 @@ public class Dao {
 								fileName, XLS, i + 1, 8, add.getHours(), true);
 						Tools.writerString(outPath, fileName, outPath,
 								fileName, XLS, i + 1, 9, add.getApply(), true);
+						break;
 					}
 				}
 			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void merge() throws IOException {
+		for (Person person : persons) {
+			String fileName = person.getDepartment() + "-" + person.getName();
+			InputStream instream = new FileInputStream(outPath + fileName + "."
+					+ XLS);
+			@SuppressWarnings("resource")
+			Workbook wb = new HSSFWorkbook(instream);
+			Sheet sheet = wb.getSheetAt(0);
+			for (int i = 5; i < sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+
+				Cell cell = row.getCell(0);
+
+				int k = 0;
+				while (sheet.getRow(i + k + 1).getCell(0).getStringCellValue()
+						.equals(cell.getStringCellValue())
+						&& cell.getStringCellValue() != "" && cell != null) {
+					k++;
+				}
+				if (k > 0) {
+
+					CellStyle style = wb.createCellStyle();
+					style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+					style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+					style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+					style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+					style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+					style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+					sheet.addMergedRegion(new CellRangeAddress(i, i + k, 0, 0));
+					sheet.getRow(i).getCell(0).setCellStyle(style);
+					sheet.addMergedRegion(new CellRangeAddress(i, i + k, 1, 1));
+					sheet.getRow(i).getCell(1).setCellStyle(style);
+					sheet.addMergedRegion(new CellRangeAddress(i, i + k, 2, 2));
+					sheet.getRow(i).getCell(2).setCellStyle(style);
+					sheet.addMergedRegion(new CellRangeAddress(i, i + k, 3, 3));
+					sheet.getRow(i).getCell(3).setCellStyle(style);
+					sheet.addMergedRegion(new CellRangeAddress(i, i + k, 4, 4));
+					sheet.getRow(i).getCell(4).setCellStyle(style);
+					System.out.println(fileName + i + "," + (i + k));
+					i += k;
+				}
+
+			}
+			OutputStream outstream = new FileOutputStream(outPath + fileName
+					+ "." + XLS);
+			wb.write(outstream);
+			outstream.close();
 		}
 	}
 }
