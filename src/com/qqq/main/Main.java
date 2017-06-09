@@ -92,8 +92,8 @@ public class Main {
 		// Dao.setHolidays(startDate);
 		// Dao.sumPBs();
 		Dao.setAdds();
+		Dao.fix();
 		Dao.merge();
-
 
 		Date end = new Date();
 		System.out.println("use" + (end.getTime() - start.getTime()) / 1000

@@ -64,6 +64,8 @@ public class Tools {
 	public static void writerString(String inPath, String inFileName,
 			String outPath, String outFileName, String fileType, int rowNum,
 			int cellNum, String string, boolean flag) throws IOException {
+		System.out.println(outFileName + " " + rowNum + "," + cellNum + " "
+				+ string);
 		File file = new File(outPath);
 		file.mkdir();
 		InputStream instream = new FileInputStream(inPath + inFileName + "."
@@ -122,7 +124,6 @@ public class Tools {
 		OutputStream outstream = new FileOutputStream(outPath + outFileName
 				+ "." + fileType);
 
-		System.out.println(rowNum + "," + cellNum + " " + string);
 		wb.write(outstream);
 		// wb.close();
 		outstream.close();
@@ -132,6 +133,8 @@ public class Tools {
 	public static void writerDouble(String inPath, String inFileName,
 			String outPath, String outFileName, String fileType, int rowNum,
 			int cellNum, double string, boolean flag) throws IOException {
+		System.out.println(outFileName + " " + rowNum + "," + cellNum + " "
+				+ string);
 		InputStream instream = new FileInputStream(inPath + inFileName + "."
 				+ fileType);
 		Workbook wb = null;
@@ -167,13 +170,15 @@ public class Tools {
 		} else {
 			cell.setCellStyle(style2);
 		}
-		cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+
+		if (cell != null) {
+			cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+		}
 		cell.setCellValue(string);
 
 		OutputStream outstream = new FileOutputStream(outPath + outFileName
 				+ "." + fileType);
 
-		System.out.println(rowNum + "," + cellNum + " " + string);
 		wb.write(outstream);
 		// wb.close();
 		outstream.close();

@@ -1,6 +1,7 @@
 package com.qqq.data;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +66,11 @@ public class Dao {
 	static String out;
 
 	static List<Person> persons;
+	static List<PBPerson> pbPersons;
+	static List<KQPerson> kqPersons;
+	static List<HolidayPerson> holidayPersons;
+	static List<Out> outList;
+	static List<Add> adds;
 
 	public static String getInPath() {
 		return inPath;
@@ -223,7 +229,7 @@ public class Dao {
 			}
 		}
 
-		List<PBPerson> pbPersons = new ArrayList<PBPerson>();
+		pbPersons = new ArrayList<PBPerson>();
 
 		for (PB pb : pbs) {
 			if (pbPersons.size() > 0) {
@@ -283,15 +289,15 @@ public class Dao {
 					+ pbPerson.getName();
 			for (int i = 0; i < pbPerson.getPbs().size(); i++) {
 				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
-						i + 5, 0, pbPerson.getPbs().get(i).getDate(), true);
+						i + 4, 0, pbPerson.getPbs().get(i).getDate(), true);
 				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
-						i + 5, 1, pbPerson.getPbs().get(i).getWeekday(), true);
+						i + 4, 1, pbPerson.getPbs().get(i).getWeekday(), true);
 				Tools.writerString(outPath, fileName, outPath, fileName, XLS,
-						i + 5, 2, pbPerson.getPbs().get(i).getPb(), true);
+						i + 4, 2, pbPerson.getPbs().get(i).getPb(), true);
 			}
-			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 38,
+			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 36,
 					1, "" + pbPerson.getZhongban(), false);
-			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 38,
+			Tools.writerString(outPath, fileName, outPath, fileName, XLS, 36,
 					4, "" + pbPerson.getYeban(), false);
 		}
 
@@ -377,7 +383,7 @@ public class Dao {
 			}
 		}
 
-		List<KQPerson> kqPersons = new ArrayList<KQPerson>();
+		kqPersons = new ArrayList<KQPerson>();
 
 		for (KQ kq : kqs) {
 			if (kqPersons.size() > 0) {
@@ -422,7 +428,7 @@ public class Dao {
 				Workbook wb = Tools.open(outPath, fileName, XLS);
 				Sheet sheet = wb.getSheetAt(0);
 				String date = kq.getDate();
-				for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+				for (int i = 4; i <= sheet.getLastRowNum(); i++) {
 					if (sheet.getRow(i).getCell(0).getStringCellValue()
 							.equals(date)) {
 						Tools.writerString(outPath, fileName, outPath,
@@ -504,7 +510,7 @@ public class Dao {
 			hols.add(hol);
 		}
 
-		List<HolidayPerson> holidayPersons = new ArrayList<HolidayPerson>();
+		holidayPersons = new ArrayList<HolidayPerson>();
 		for (Holiday holiday : hols) {
 
 			if (holidayPersons.size() > 0) {
@@ -591,22 +597,22 @@ public class Dao {
 		for (HolidayPerson holidayPerson : holidayPersons) {
 			String fileName = holidayPerson.getDepartment() + "-"
 					+ holidayPerson.getName();
-			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 37,
 					1, holidayPerson.getNianjia(), false);
-			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 37,
 					4, holidayPerson.getBingjia(), false);
-			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 37,
 					7, holidayPerson.getShijia(), false);
-			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 37,
 					10, holidayPerson.getTiaoxiu(), false);
-			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 39,
+			Tools.writerDouble(outPath, fileName, outPath, fileName, XLS, 37,
 					13, holidayPerson.getQita(), false);
 
 			for (Holiday holiday : holidayPerson.getHolidays()) {
 				Workbook wb = Tools.open(outPath, fileName, XLS);
 				Sheet sheet = wb.getSheetAt(0);
 				String date = holiday.getDate();
-				for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+				for (int i = 4; i <= sheet.getLastRowNum(); i++) {
 					if (sheet.getRow(i).getCell(0).getStringCellValue()
 							.equals(date)) {
 						if (sheet.getRow(i).getCell(10).getStringCellValue() == ""
@@ -820,7 +826,7 @@ public class Dao {
 	public static void setOuts() throws IOException, ParseException {
 		List<List<Object>> outs = Tools.readAll(inPath, out, XLS);
 
-		List<Out> outList = new ArrayList<Out>();
+		outList = new ArrayList<Out>();
 		for (int i = 3; i < outs.size(); i++) {
 			Out out = new Out();
 			out.setDate(((String) outs.get(i).get(4)).substring(5));
@@ -851,7 +857,7 @@ public class Dao {
 			Workbook wb = Tools.open(outPath, fileName, XLS);
 			Sheet sheet = wb.getSheetAt(0);
 			String date = out.getDate();
-			for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+			for (int i = 4; i <= sheet.getLastRowNum(); i++) {
 				if (sheet.getRow(i).getCell(0).getStringCellValue()
 						.equals(date)) {
 					switch (out.getTime()) {
@@ -895,7 +901,7 @@ public class Dao {
 		List<List<Object>> add2s = Tools.readAll(inPath, add2, XLS);
 		List<List<Object>> add2ses = Tools.readAll(inPath, add2se, XLS);
 
-		List<Add> adds = new ArrayList<Add>();
+		adds = new ArrayList<Add>();
 
 		for (int i = 3; i < add2s.size(); i++) {
 			Add add = new Add();
@@ -959,7 +965,7 @@ public class Dao {
 			Sheet sheet = wb.getSheetAt(0);
 			String date = add.getDate();
 
-			for (int i = 5; i <= sheet.getLastRowNum(); i++) {
+			for (int i = 4; i <= sheet.getLastRowNum(); i++) {
 				if (sheet.getRow(i).getCell(0).getStringCellValue()
 						.equals(date)) {
 					if (sheet.getRow(i).getCell(6).getStringCellValue() == "") {
@@ -1004,7 +1010,7 @@ public class Dao {
 			@SuppressWarnings("resource")
 			Workbook wb = new HSSFWorkbook(instream);
 			Sheet sheet = wb.getSheetAt(0);
-			for (int i = 5; i < sheet.getLastRowNum(); i++) {
+			for (int i = 4; i < sheet.getLastRowNum(); i++) {
 				Row row = sheet.getRow(i);
 
 				Cell cell = row.getCell(0);
@@ -1044,6 +1050,62 @@ public class Dao {
 					+ "." + XLS);
 			wb.write(outstream);
 			outstream.close();
+		}
+	}
+
+	public static void fix() throws IOException {
+		for (PBPerson pbPerson : pbPersons) {
+			String fileName = pbPerson.getDepartment() + "-"
+					+ pbPerson.getName();
+			InputStream instream = new FileInputStream(outPath + fileName + "."
+					+ XLS);
+			@SuppressWarnings("resource")
+			Workbook wb = new HSSFWorkbook(instream);
+			Sheet sheet = wb.getSheetAt(0);
+			for (int i = 4; i < sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+
+				if (row.getCell(2) != null) {
+					if (row.getCell(2).getStringCellValue().contains("中班")
+							&& row.getCell(10).getStringCellValue() != ""
+							&& !row.getCell(0)
+									.getStringCellValue()
+									.equals(sheet.getRow(i - 1).getCell(0)
+											.getStringCellValue())) {
+						pbPerson.setZhongban(pbPerson.getZhongban() - 1);
+						System.out.println(pbPerson.getName() + "zhong-");
+					}
+
+					if (row.getCell(2).getStringCellValue().contains("晚班")
+							&& row.getCell(10).getStringCellValue() != ""
+							&& !row.getCell(0)
+									.getStringCellValue()
+									.equals(sheet.getRow(i - 1).getCell(0)
+											.getStringCellValue())) {
+						pbPerson.setYeban(pbPerson.getYeban() - 1);
+						System.out.println(pbPerson.getName() + "ye-");
+					}
+
+					if (row.getCell(6).getStringCellValue().contains("21:00")
+							&& row.getCell(7).getStringCellValue()
+									.contains("09:00")) {
+						pbPerson.setYeban(pbPerson.getYeban() + 1);
+						System.out.println(pbPerson.getName() + "ye+");
+					}
+				}
+			}
+
+			for (int i = 36; i <= sheet.getLastRowNum(); i++) {
+				if (sheet.getRow(i).getCell(0).getStringCellValue()
+						.equals("中班数：")) {
+					Tools.writerString(outPath, fileName, outPath, fileName,
+							XLS, i, 1, "" + pbPerson.getZhongban(), false);
+					Tools.writerString(outPath, fileName, outPath, fileName,
+							XLS, i, 4, "" + pbPerson.getYeban(), false);
+				}
+
+			}
+
 		}
 	}
 }
